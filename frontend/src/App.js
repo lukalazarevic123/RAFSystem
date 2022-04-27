@@ -8,7 +8,7 @@ function App() {
     <div className="App">
       <Header />
       <Container  className="justify-content-center text-center mt-5">
-        <ExamTable exams = {[]}/>
+        <ExamTable exams = {[{id: 123, name: "asp", professor: "urosevic"}]}/>
       </Container>
       
     </div>
