@@ -17,6 +17,7 @@ contract RAFSystem is IRAFSystem {
 
     mapping(uint => Ispit) public ispiti;
     mapping(uint => mapping(address => bool)) prijavljeni; //ISPIT > (STUDENT > PRIJAVLJEN)
+    mapping(address => uint) skolarina;
 
 
     modifier samoProfesor {
@@ -54,6 +55,7 @@ contract RAFSystem is IRAFSystem {
         Student memory _novi = Student(_smer, 1, _indeks);
 
         studenti[_noviStudent] = _novi;
+        skolarina[_noviStudent] = 3 * (10 ** 15);
         emit UpisanStudent(_novi);
     }
 
