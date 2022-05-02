@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button, Form, FormSelect, Spinner } from "react-bootstrap";
+import './styles/NewExamForm.css';
 
 export default function NewExamForm(props){
 
@@ -13,7 +14,7 @@ export default function NewExamForm(props){
     }
 
     return(
-        <Form onSubmit = {evt => handleExam(evt)}>
+        <Form onSubmit = {evt => handleExam(evt)} className = "form-box">
             <h3>Create an exam</h3>
             <Form.Group>
                 <Form.Label>Subject name</Form.Label>
@@ -26,7 +27,11 @@ export default function NewExamForm(props){
             </Form.Group>
             <Form.Group>
                 <Form.Label>Exam date</Form.Label>
-                <Form.Control type = "date" onChange={evt => setExamDate(evt.target.value)} required />
+                <Form.Control 
+                    type = "date" 
+                    onChange={evt => setExamDate(evt.target.value)}
+                    required 
+                />
             </Form.Group>
             <div>
                 {isLoading?
