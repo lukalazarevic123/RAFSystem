@@ -45,6 +45,8 @@ interface IRAFSystem {
 
     function odrziIspit(uint8 _ispitID) external;
 
+    function platiSkolarinu() external;
+
     function izracunajOcenu(address _student, uint _predmetID) view external returns (uint8);
 
     function getPredmet(uint _predmetID) external view returns (Predmet memory);

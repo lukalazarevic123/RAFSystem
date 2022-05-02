@@ -128,4 +128,28 @@ contract RAFSystem is IRAFSystem {
         emit PrijavljenIspit(studenti[msg.sender]);
     }
 
+    function platiSkolarinu() public override payable validanStudent(msg.sender){
+        require(skolarina[msg.sender] != 0, "platiSkolarinu: Skolarina vec placena!");
+
+        uint _uplata = msg.value;
+        uint _maksimalno = maksimalnaUplata(_uplata, msg.sender);
+        uint _dug = skolarina[msg.sender];
+
+        skolarina[msg.sender] = _dug - _maksimalno;
+
+        if(_uplata > _maksimalno){
+            payable(msg.sender).transfer(_uplata - _maksimalno);
+        }
+    }
+
+    function maksimalnaUplata(uint _uplata, address _student) internal view returns(uint){
+        uint _max = skolarina[_student];
+
+        if(_uplata <= _maksi){
+            return _uplata;
+        }
+
+        return _max;
+    }
+
 }
