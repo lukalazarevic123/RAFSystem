@@ -7,6 +7,7 @@ export default function NewStudentForm(props){
     const [studentName, setStudentName] = useState("");
     const [department, setDepartment] = useState(0);
     const [year, setYear] = useState(0);
+    const [address, setAddress] = useState(null);
     const [isLoading, setLoading] = useState(false);
 
     const handleStudent = async(evt) => {
@@ -42,6 +43,15 @@ export default function NewStudentForm(props){
                     type = "number" 
                     min = "1" 
                     placeholder = "Year..."
+                    onChange = {(evt) => setYear(evt.target.value)}
+                    required 
+                />
+            </Form.Group>
+            <Form.Group>
+                <Form.Label>Students address</Form.Label>
+                <Form.Control 
+                    type = "text" 
+                    placeholder = "Address..."
                     onChange = {(evt) => setYear(evt.target.value)}
                     required 
                 />
