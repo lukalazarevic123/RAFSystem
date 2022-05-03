@@ -13,7 +13,7 @@ contract RAFSystem is IRAFSystem {
     mapping(address => bool) public profesori;
 
     mapping(uint => Predmet) public predmeti;
-    mapping(uint => mapping(address => uint8)) polozeno;  // PREDMET > (STUDENT > BODOVI)
+    mapping(uint => mapping(address => uint8)) polozeno;  // PREDMET > (STUDENT > OCENA)
 
     mapping(uint => Ispit) public ispiti;
     mapping(uint => mapping(address => bool)) prijavljeni; //ISPIT > (STUDENT > PRIJAVLJEN)
@@ -64,10 +64,9 @@ contract RAFSystem is IRAFSystem {
         delete studenti[_student];
     }
 
-    function izracunajOcenu(address _student, uint _predmetID) view override public validanStudent(_student) validanPredmet(_predmetID) returns (uint8) {
-        uint8 _poeni = polozeno[_predmetID][_student];
+    function izracunajOcenu(uint8 _poeni) view override public returns (uint8) {
 
-        if (_poeni == 0) {// student nije polozio predmet
+        if (_poeni <= 50) {// student nije polozio predmet
             return 5;
         } else if (_poeni <= 60) {
             return 6;
@@ -84,6 +83,10 @@ contract RAFSystem is IRAFSystem {
 
     function getLatestPredmetID() view public returns (uint256) {
         return Counters.current(_predmetIDCounter) - 1;
+    }
+
+    function getLatestIspitID() view public returns(uint){
+        return Counters.current(_ispitIDCounter) - 1;
     }
 
     function getPredmet(uint _predmetID) public override view validanPredmet(_predmetID) returns (Predmet memory)  {
@@ -126,6 +129,21 @@ contract RAFSystem is IRAFSystem {
         prijavljeni[_ispitID][msg.sender] = true;
 
         emit PrijavljenIspit(studenti[msg.sender]);
+    }
+
+    function odrziIspit(uint8 _ispitID, uint8[] memory ocene) public override samoProfesor validanIspit(_ispitID) {
+        require(ocene.length == studenti.length, "odrziIspit: Nedovoljno ocena!");
+        Ispit ispit = ispiti[_ispitID];
+        uint8 _predmetID = ispit.predmetID;
+        address[] studenti = ispit.studenti;
+
+        for(uint i = 0; i < studenti.length; i++){
+            uint8 _ocena = izracunajOcenu(ocene[i]);
+            if(_ocena > 5){
+                polozeno[_predmetID][studenti[i]] = _ocena;
+                //mint nft
+            }
+        }
     }
 
     function platiSkolarinu() public override payable validanStudent(msg.sender){

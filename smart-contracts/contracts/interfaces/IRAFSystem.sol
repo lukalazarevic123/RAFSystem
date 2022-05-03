@@ -27,7 +27,7 @@ interface IRAFSystem {
     }
 
     struct Ispit {
-        Predmet predmet;
+        uint8 predmetID;
         uint vremeOdrzavanja;
         address[] studenti;
         bool odrzan;
@@ -43,7 +43,7 @@ interface IRAFSystem {
     
     function prijaviIspit(uint8 _ispitID) external payable;
 
-    function odrziIspit(uint8 _ispitID) external;
+    function odrziIspit(uint8 _ispitID, uint8[] memory bodovi) external;
 
     function platiSkolarinu() external;
 
