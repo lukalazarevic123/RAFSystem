@@ -1,13 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+pragma experimental ABIEncoderV2;
 
 import "./interfaces/IRAFSystem.sol";
+import "./RAFOceneNFT.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract RAFSystem is IRAFSystem {
     using Counters for Counters.Counter;
     Counters.Counter private _predmetIDCounter;
     Counters.Counter private _ispitIDCounter;
+
+    RAFOceneNFT public ocena;
 
     mapping(address => Student) public studenti;
     mapping(address => bool) public profesori;
@@ -41,8 +46,9 @@ contract RAFSystem is IRAFSystem {
         _;
     }
 
-    constructor() {
+    constructor(RAFOceneNFT _ocena) {
         profesori[msg.sender] = true;
+        ocena = _ocena;
 
         dodajPredmet("DS & Algorithms" , "John Doe", 8);
         dodajPredmet("Math 1" , "Jane Doe", 8);
@@ -102,7 +108,7 @@ contract RAFSystem is IRAFSystem {
         require(bytes(_nazivPredmeta).length != 0 && bytes(_imeProfesora).length != 0, "dodajPredmet: Imena predmeta i profesora ne mogu biti prazni!");
         require(_espb > 0, "dodajPredmet: ESPB mora biti veci od 0!");
 
-        Predmet memory _noviPredmet = Predmet(0, _espb, _nazivPredmeta, _imeProfesora);
+        Predmet memory _noviPredmet = Predmet(_espb, _nazivPredmeta, _imeProfesora);
         uint256 _predmetID = Counters.current(_predmetIDCounter);
         predmeti[_predmetID] = _noviPredmet;
 
@@ -112,8 +118,13 @@ contract RAFSystem is IRAFSystem {
 
     function dodajIspit(uint8 _predmetID, uint _vremeOdrzavanja) public override samoProfesor validanPredmet(_predmetID) {
         require(_vremeOdrzavanja <= block.timestamp, "dodajIspit: Ispit ne moze da se odrzi u proslosti!");
+        address[] memory _studenti;
+        Ispit memory _noviIspit = Ispit(_predmetID, _vremeOdrzavanja, _studenti, false);
 
-        Ispit memory _noviIspit = Ispit(_predmetID, _vremeOdrzavanja, new address[], false);
+        // _noviIspit.predmetID = _predmetID;
+        // _noviIspit.vremeOdrzavanja = _vremeOdrzavanja;
+        // _noviIspit.odrzan = false;
+
         uint _ispitID = Counters.current(_ispitIDCounter);
         ispiti[_ispitID] = _noviIspit;
 
@@ -132,16 +143,17 @@ contract RAFSystem is IRAFSystem {
     }
 
     function odrziIspit(uint8 _ispitID, uint8[] memory ocene) public override samoProfesor validanIspit(_ispitID) {
-        require(ocene.length == studenti.length, "odrziIspit: Nedovoljno ocena!");
-        Ispit ispit = ispiti[_ispitID];
+        require(ocene.length == ispiti[_ispitID].studenti.length, "odrziIspit: Nedovoljno ocena!");
+        Ispit memory ispit = ispiti[_ispitID];
         uint8 _predmetID = ispit.predmetID;
-        address[] studenti = ispit.studenti;
+        address[] memory studenti = ispit.studenti;
 
         for(uint i = 0; i < studenti.length; i++){
             uint8 _ocena = izracunajOcenu(ocene[i]);
             if(_ocena > 5){
                 polozeno[_predmetID][studenti[i]] = _ocena;
-                //mint nft
+                string memory _uri = string(abi.encodePacked("Student polozio sa ocenom", Strings.toString(_ocena)));
+                ocena.mint(studenti[i], _uri);
             }
         }
     }
@@ -163,7 +175,7 @@ contract RAFSystem is IRAFSystem {
     function maksimalnaUplata(uint _uplata, address _student) internal view returns(uint){
         uint _max = skolarina[_student];
 
-        if(_uplata <= _maksi){
+        if(_uplata <= _max){
             return _uplata;
         }
 

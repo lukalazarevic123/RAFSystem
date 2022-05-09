@@ -12,6 +12,9 @@
   "author": "Luka Lazarevic",
   "license": "ISC",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.6.0"
+    "@openzeppelin/contracts": "^4.6.0",
+    "@truffle/hdwallet-provider": "^2.0.8",
+    "dotenv": "^16.0.0",
+    "truffle": "^5.5.13"
   }
 }

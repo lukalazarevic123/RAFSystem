@@ -1,16 +1,17 @@
 pragma solidity ^0.8.0;
-pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "./interfaces/IRAFOceneNFT.sol";
 
-contract RAFOceneNFT is ERC721, Ownable {
+contract RAFOceneNFT is IRAFOceneNFT, ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _nextTokenID;
 
     mapping(address => bool) public authorized;
 
-    constructor () public ERC721("RAF Ocene", "RAFO") {}
+    constructor () ERC721("RAF Ocene", "RAFO") {}
 
     function authorize(address _addr) external onlyOwner{
         require(!authorized[_addr], "RAFOceneNFT::authorize: Address already authorized!");
@@ -21,12 +22,13 @@ contract RAFOceneNFT is ERC721, Ownable {
     function mint(address to, string memory uri) external {
         require(authorized[msg.sender], "RAFOceneNFT::mint: Address not authorized to mint!");
     
-        _safeMint(to, nextTokenId);
-        _setNFTUri(uri, nextTokenId++);
+        _mint(to, Counters.current(_nextTokenID));
+        Counters.increment(_nextTokenID);
+        _setNFTUri(uri, Counters.current(_nextTokenID));
     }
 
     function _setNFTUri(string memory _uri, uint256 _tokenId) internal {            
-        _setTokenURI(_tokenId, campaign.uri);
+        _setTokenURI(_tokenId, _uri);
     }
 
 }

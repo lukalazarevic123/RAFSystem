@@ -23,6 +23,13 @@
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
+require('dotenv').config();
+
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const MNEMONIC = process.env["MNEMONIC"];
+const ENDPOINT_KEY = process.env["ENDPOINT_KEY"];
+const ETHERSCAN_KEY = process.env["ETHERSCAN_KEY"];
+
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -35,6 +42,14 @@ module.exports = {
    */
 
   networks: {
+    rinkeby: {
+      provider: () => new HDWalletProvider(
+        MNEMONIC, `https://rinkeby.infura.io/v3/${ENDPOINT_KEY}`
+      ),
+      network_id: 4,
+      gasPrice: 10e9,
+      skipDryRun: true
+    }
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache-cli, geth or parity) in a separate terminal
@@ -92,6 +107,12 @@ module.exports = {
       // }
     }
   },
+  plugins:[
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    etherscan: ETHERSCAN_KEY
+  }
 
   // Truffle DB is currently disabled by default; to enable it, change enabled:
   // false to enabled: true. The default storage location can also be
