@@ -68,6 +68,7 @@ contract RAFSystem is IRAFSystem {
     function ispisiStudenta(address _student) override public samoProfesor validanStudent(_student) {
         emit IspisanStudent(studenti[_student]);
         delete studenti[_student];
+        delete skolarina[_student];
     }
 
     function izracunajOcenu(uint8 _poeni) view override public returns (uint8) {
@@ -136,6 +137,7 @@ contract RAFSystem is IRAFSystem {
         require(ispiti[_ispitID].vremeOdrzavanja > block.timestamp, "validanIspit: Rok za prijavu ispita je prosao!");
         require(!prijavljeni[_ispitID][msg.sender], "prijaviIspit: Student je vec prijavio ispit!");
         require(msg.value == 5 * (10**14), "prijaviIspit: Prijava za ispit kosta 0.0005 eth!");
+        require(skolarina[_msg.sender] <= 2 * (10 ** 15), "prijaviIspit: student mora da plati barem trecinu skolarine!");
 
         prijavljeni[_ispitID][msg.sender] = true;
 
