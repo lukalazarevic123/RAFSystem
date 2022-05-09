@@ -182,4 +182,12 @@ contract RAFSystem is IRAFSystem {
         return _max;
     }
 
+    function getStudent(address _student) external view returns(Student memory){
+        return studenti[_student];
+    }
+
+    function isProfessor(address _professor) external view returns(bool){
+        return profesori[_professor];
+    }
+
 }
